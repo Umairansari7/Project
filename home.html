@@ -93,6 +93,15 @@ height: 300px;
 font-size: 13px;
 color: white;
 }
+#imgdiv{
+width:160px;
+float:left;
+margin-left:20px;
+}
+#reload{
+float:right;
+margin-right:40px;
+}
 </style>
 </head>
   <body>
@@ -294,11 +303,13 @@ color: white;
 
                                     <h4 style="color:white; text-align:center;">Enquiry</h4><br>
                                     <form>
-                                            <input type="text" class="form-control" placeholder="Enter your name"><br>
-                                            <input type="text" class="form-control" placeholder="Enter your phone number"><br>
-                                            <input type="email" class="form-control" placeholder="Enter your email"><br>
-                                            <input type="text" class="form-control" placeholder="Enter your message"><br>
-                                            <button type="submit" class="btn text-center"><i class="fa fa-arrow-right"></i></button>
+                                            <input id="name" type="text" name="name" class="form-control" placeholder="Enter your name"><br>
+                                            <input id="phone" name="phone" type="text" class="form-control" placeholder="Enter your phone number"><br>
+                                            <input id="email" name="email" type="email" class="form-control" placeholder="Enter your email"><br>
+                                            <input id="message" type="text" name="message" class="form-control" placeholder="Enter your message"><br>
+                                            <div><div id="asdf"><img id="img" src="captcha.php" /></div><br>
+                                            <input id="captcha" name="captcha" type="text"><img id="reload" src="reload.png" /></div><br>
+                                            <button id="submit" type="submit" class="btn text-center"><i class="fa fa-arrow-right"></i></button>
                                               </form>
                                         </div>
 
@@ -326,32 +337,73 @@ color: white;
 </script>
 <script>
 function myfunction() {
+  $("#reload").click(function() {
+          $("img#img").remove();
+  		var id = Math.random();
+          $('<img id="img" src="captcha.php?id='+id+'"/>').appendTo("#asdf");
+  		 id ='';
+      });
+
   $('#submit').click(function(e){
-  if(!($("#name").val().match(/^[a-zA-Z]+$/)) || $("#name").val().length == 0){
-    alert("Please Input the correct values");
+    if(!($("#name").val().match(/^[a-zA-Z]+$/)) || $("#name").val().length == 0){
+      alert("Please Input the correct values");
+      e.preventDefault();
+      return false;
+    }
+    if(!($("#phone").val().match(/^[0-9]+$/)) || $("#phone").val().length>11){
+      alert("please input the correct number");
+      e.preventDefault();
+      return false;
+    }
+    if(!($("#email").val().match(/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/))|| $("#email").val().length==0){
+      alert("Enter correct email");
+      e.preventDefault();
+      return false;
+    }
     e.preventDefault();
-    return false;
-  }
-  if(!($("#phone").val().match(/^[0-9]+$/)) || $("#phone").val().length>11){
-    alert("please input the correct number");
-    e.preventDefault();
-    return false;
-  }
-  if(!($("#email").val().match(/^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/))|| $("#email").val().length==0){
-    alert("Enter correct email");
-    e.preventDefault();
-    return false;
-  }
+    function reset(){
+      var name1 = $('#name').val('');
+      var phone1 = $('#phone').val('');
+      var email1 = $('#email').val('');
+      var message1 = $('#message').val('');
+      var captcha1  = $('#captcha').val('');
+    }
+    function submit(){
+      var name1 = $('#name').val();
+      var phone1 = $('#phone').val();
+      var email1 = $('#email').val();
+      var message1 = $('#message').val();
+      var captcha1  = $('#captcha').val();
+      $.ajax({
+        url: "dev.php",
+        type : "post",
+        data:{name:name1, phone:phone1, email:email1, message:message1, captcha:captcha1},
+        success : function(text){
+        }
+      });
+    }
+    $('#img').attr('src', 'captcha.php?');
+    submit();
+    reset();
   });
   $("#phone").on('keypress',function (evt){
-  evt = evt || window.event;
-  var charCode = evt.which || evt.keyCode;
-  if(charCode >= 48 && charCode <= 57){
-    return true;
-  }else {
-    evt.preventDefault();
-  }
-});
+    evt = evt || window.event;
+    var charCode = evt.which || evt.keyCode;
+    if(charCode >= 48 && charCode <= 57){
+      return true;
+    }else {
+      evt.preventDefault();
+    }
+  });
+  $("#name").on('keypress',function (evt){
+    evt = evt || window.event;
+    var charCode = evt.which || evt.keyCode;
+    if(charCode >= 65 && charCode <= 122){
+      return true;
+    }else {
+      evt.preventDefault();
+    }
+  });
 }
 $(document).ready(myfunction());
 
